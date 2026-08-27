@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Clip2PDF</string>
+    <string name="no_text_error">No text was shared.</string>
+    <string name="save_error">Could not save PDF.</string>
+    <string name="saved_message">PDF saved.</string>
+    <string name="launcher_hint">Share selected text to Clip2PDF to save it as a PDF.</string>
+</resources>
