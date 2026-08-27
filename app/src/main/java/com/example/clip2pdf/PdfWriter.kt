@@ -15,7 +15,8 @@ class PdfWriter(
     private val pageSpec: PageSpec = PageSpec()
 ) {
     fun write(text: String, outputStream: OutputStream) {
-        PdfDocument().use { document ->
+        val document = PdfDocument()
+        try {
             val paint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.BLACK
                 textSize = pageSpec.textSizePoints
@@ -43,6 +44,8 @@ class PdfWriter(
             }
 
             document.writeTo(outputStream)
+        } finally {
+            document.close()
         }
     }
 
