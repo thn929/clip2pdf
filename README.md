@@ -42,9 +42,23 @@ GitHub Actions builds the app on every push and on manual workflow dispatch:
 
 - workflow: `.github/workflows/android.yml`
 - artifact name: `Clip2PDF-debug-apk`
-- APK path inside the artifact: `app-debug.apk`
+- APK path inside the artifact: `Clip2PDF-debug.apk`
+
+When a tag beginning with `v` is pushed, for example `v0.1.0`, the workflow also creates a GitHub Release and attaches `Clip2PDF-debug.apk` as a downloadable release asset. You can also publish a release manually from the workflow page by enabling the `publish_release` input.
+
+For now this is an installable debug-signed APK. That is fine for sideloading and sharing a small utility from GitHub. It is not Play Store release signing.
 
 ## Downloading the APK from GitHub
+
+Recommended public download flow:
+
+1. Open the repository on GitHub.
+2. Tap **Releases**.
+3. Open the latest release.
+4. Download **Clip2PDF-debug.apk**.
+5. Install it on your Android phone.
+
+Workflow artifact download flow:
 
 1. Open the repository on GitHub.
 2. Tap **Actions**.
@@ -52,7 +66,7 @@ GitHub Actions builds the app on every push and on manual workflow dispatch:
 4. Scroll to **Artifacts**.
 5. Download **Clip2PDF-debug-apk**.
 6. Unzip the downloaded artifact.
-7. Install `app-debug.apk` on your Android phone.
+7. Install `Clip2PDF-debug.apk` on your Android phone.
 
 ## Installing on Android
 

@@ -2,11 +2,25 @@ name: Android
 
 on:
   push:
+    tags:
+      - "v*"
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: "Create or update a GitHub Release for this build"
+        type: boolean
+        default: false
+      release_tag:
+        description: "Release tag to create/update when publish_release is true"
+        type: string
+        default: "v0.1.0"
+
+permissions:
+  contents: write
 
 jobs:
   build:
-    name: Build debug APK
+    name: Build APK
     runs-on: ubuntu-latest
 
     steps:
@@ -28,9 +42,31 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug
 
+      - name: Prepare APK asset
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk dist/Clip2PDF-debug.apk
+
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: Clip2PDF-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: dist/Clip2PDF-debug.apk
           if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.publish_release == true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || inputs.release_tag }}
+        run: |
+          gh release create "$RELEASE_TAG" \
+            dist/Clip2PDF-debug.apk \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Clip2PDF $RELEASE_TAG" \
+            --notes "Installable debug APK for Clip2PDF. Download Clip2PDF-debug.apk on your Android phone and open it to install." \
+            --latest \
+          || gh release upload "$RELEASE_TAG" \
+            dist/Clip2PDF-debug.apk \
+            --repo "$GITHUB_REPOSITORY" \
+            --clobber
