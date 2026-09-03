@@ -1,6 +1,7 @@
 package com.example.clip2pdf
 
 import android.app.Activity
+import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -78,6 +79,7 @@ class ShareToPdfActivity : Activity() {
     private fun openPdf(uri: Uri) {
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, "application/pdf")
+            clipData = ClipData.newUri(contentResolver, "Saved PDF", uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
