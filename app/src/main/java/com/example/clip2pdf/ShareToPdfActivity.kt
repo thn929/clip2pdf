@@ -2,6 +2,7 @@ package com.example.clip2pdf
 
 import android.app.Activity
 import android.content.ClipData
+import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -77,16 +78,31 @@ class ShareToPdfActivity : Activity() {
     }
 
     private fun openPdf(uri: Uri) {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "application/pdf")
-            clipData = ClipData.newUri(contentResolver, "Saved PDF", uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
+        val intent = drivePdfIntent(uri) ?: pdfViewIntent(uri)
 
         try {
             startActivity(intent)
         } catch (_: Exception) {
             // Saving succeeded; skip opening if no installed app can view PDFs.
+        }
+    }
+
+    private fun drivePdfIntent(uri: Uri): Intent? {
+        val intent = pdfViewIntent(uri).apply {
+            component = ComponentName(
+                GOOGLE_DRIVE_PACKAGE,
+                GOOGLE_DRIVE_PDF_VIEWER_ACTIVITY
+            )
+        }
+
+        return if (intent.resolveActivity(packageManager) != null) intent else null
+    }
+
+    private fun pdfViewIntent(uri: Uri): Intent {
+        return Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/pdf")
+            clipData = ClipData.newUri(contentResolver, "Saved PDF", uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
     }
 
@@ -107,6 +123,8 @@ class ShareToPdfActivity : Activity() {
     }
 
     companion object {
+        private const val GOOGLE_DRIVE_PACKAGE = "com.google.android.apps.docs"
+        private const val GOOGLE_DRIVE_PDF_VIEWER_ACTIVITY = "com.google.android.apps.viewer.PdfViewerActivity"
         private const val KEY_SHARED_TEXT = "sharedText"
         private const val REQUEST_CREATE_DOCUMENT = 1001
     }
