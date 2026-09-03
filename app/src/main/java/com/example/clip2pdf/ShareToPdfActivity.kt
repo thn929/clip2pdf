@@ -69,8 +69,22 @@ class ShareToPdfActivity : Activity() {
             } ?: throw IllegalStateException("No output stream for $uri")
 
             Toast.makeText(this, R.string.saved_message, Toast.LENGTH_SHORT).show()
+            openPdf(uri)
         } catch (_: Exception) {
             Toast.makeText(this, R.string.save_error, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun openPdf(uri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/pdf")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+
+        try {
+            startActivity(intent)
+        } catch (_: Exception) {
+            // Saving succeeded; skip opening if no installed app can view PDFs.
         }
     }
 
